@@ -1,5 +1,5 @@
-#include "state.h"
-#include "charliePlexing.h"
+#include "headers/state.h"
+#include "headers/charliePlexing.h"
 #include <stdbool.h>
 
 volatile uint8_t charlieBufferSize = 0;
@@ -31,13 +31,7 @@ charliePlexPair minuteLEDS[NUMBER_OF_MINUTE_LEDS] = {
                         };
 
 charliePlexPair indicatorLED = {3, 4};
-
-void indicate() {
-  DDRB = 0;
-  PORTB = 0;
-  DDRB |= (1 << indicatorLED.pin1) | (1 << indicatorLED.pin2);
-  PORTB |= (1 << indicatorLED.pin1);
-}
+charliePlexPair alarmLED = {4, 3};
 
 void buttonHandler() {
   DDRB = 0;
@@ -72,6 +66,18 @@ void charlieRender(uint8_t sliceStart, uint8_t sliceEnd) {
     sliceEnd = charlieBufferSize;
 
   if (charlieBufferPos >= sliceEnd) {
+    if (ALARM_FIRING) {
+      DDRB = 0;
+      PORTB = 0;
+      DDRB |= (1 << alarmLED.pin1) | (1 << alarmLED.pin2);
+      PORTB |= (1 << alarmLED.pin1);
+    }
+    if (INDICATING) {
+      DDRB = 0;
+      PORTB = 0;
+      DDRB |= (1 << indicatorLED.pin1) | (1 << indicatorLED.pin2);
+      PORTB |= (1 << indicatorLED.pin1);
+    }
     charlieBufferPos = sliceStart;
     buttonHandler();
   }

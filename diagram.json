@@ -120,6 +120,13 @@
       "top": 109.55,
       "left": 163.2,
       "attrs": { "value": "250" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led20",
+      "top": -186,
+      "left": 224.6,
+      "attrs": { "color": "red" }
     }
   ],
   "connections": [
@@ -162,7 +169,9 @@
     [ "tiny:PB3", "led19:A", "orange", [ "v19.2", "h191.6", "v-124.8" ] ],
     [ "btn1:2.r", "tiny:GND", "gray", [ "h86.6", "v86.6", "h-307.2", "v-28.8" ] ],
     [ "tiny:PB3", "r1:2", "orange", [ "v86.4", "h230", "v48" ] ],
-    [ "btn1:1.l", "r1:2", "cyan", [ "h-28.8" ] ]
+    [ "btn1:1.l", "r1:2", "cyan", [ "h-28.8" ] ],
+    [ "led19:A", "led20:C", "green", [ "v9.6", "h48" ] ],
+    [ "led19:C", "led20:A", "green", [ "v19.2", "h67.6" ] ]
   ],
   "dependencies": {}
 }

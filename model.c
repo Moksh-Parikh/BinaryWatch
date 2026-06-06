@@ -1,6 +1,6 @@
-#include "model.h"
-#include "state.h"
-#include "charliePlexing.h"
+#include "headers/model.h"
+#include "headers/state.h"
+#include "headers/charliePlexing.h"
 
 void fillBufferWithTime(uint8_t hours, uint8_t minutes) {
   uint8_t adjustedHours = hours < NUMBER_OF_HOUR_LEDS ? hours : hours - NUMBER_OF_HOUR_LEDS;
@@ -50,8 +50,11 @@ void incrementDisplayMode() {
 
 void modelUpdate(int8_t clicks, uint8_t clickGap) {
   if (clickGap < MAX_CLICK_GAP) return;
-  
-  if (clicks > 0) {
+
+  if (clicks == 0) {
+    CLEAR_VALUE(otherFlags, INDICATION_FLAG);
+  }
+  else if (clicks > 0) {
     switch (clicks) {
       case 1:
         if (GET_VALUE(clicksAndFlags, DISPLAY_MODE) == TIME_SET) {
@@ -83,7 +86,8 @@ void modelUpdate(int8_t clicks, uint8_t clickGap) {
     CLEAR_VALUE(clicksAndFlags, CLICKS);
   }
   else if (clicks == -1) { // hold
-    indicate();
+    INDICATE;
+    clicksAndFlags &= ~DISPLAY_MODE_MASK;
   }
 }
 

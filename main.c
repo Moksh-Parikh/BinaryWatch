@@ -1,6 +1,8 @@
-#include "state.h"
-#include "charliePlexing.h"
-#include "model.h"
+#include "headers/state.h"
+#include "headers/charliePlexing.h"
+#include "headers/model.h"
+
+#include <stdint.h>
 
 #define TICKS_PER_SEC 23
 
@@ -8,7 +10,9 @@
                       (1 << DISPLAY_STATE_OFFSET)
 
 volatile uint16_t clicksAndFlags = 0;
+volatile uint8_t otherFlags = 0;
 volatile uint16_t time = 0;
+volatile uint16_t timerTime = 0;
 volatile int ticks = 0;
 
 void removeElement(charliePlexPair value) {
@@ -48,6 +52,10 @@ void handleClicks() {
   }
 }
 
+void checkTimer() {
+    if (timerTime == time) FIRE_ALARM;
+}
+
 ISR(TIMER1_COMPA_vect) {
   cli();
 
@@ -56,6 +64,7 @@ ISR(TIMER1_COMPA_vect) {
 
   if (ticks >= TICKS_PER_SEC - 1) {
     ticks = 0;
+    CLEAR_VALUE(otherFlags, ALARM_FLAG);
     INCREMENT_TIME;
     // uint8_t displayMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
     
@@ -63,6 +72,9 @@ ISR(TIMER1_COMPA_vect) {
         GET_VALUE(clicksAndFlags, DISPLAY_MODE) != TIME_SET
     ) {
       updateTimeBuffer();
+      if (timerTime != 0) {
+        checkTimer();
+      }
     }
   }
   ticks++;
@@ -128,6 +140,7 @@ int main(void) {
   time |= (12 << MINUTES_OFFSET);
   time |= 45;
   clicksAndFlags = DEFAULT_FLAGS;
+  timerTime = (6 << HOURS_OFFSET) | (13 << MINUTES_OFFSET);
 
   fillBufferWithTime(
     GET_VALUE(time, HOURS),

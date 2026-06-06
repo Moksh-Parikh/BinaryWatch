@@ -27,7 +27,7 @@ extern charliePlexPair hourLEDS[NUMBER_OF_HOUR_LEDS];
 extern charliePlexPair minuteLEDS[NUMBER_OF_MINUTE_LEDS];
 
 extern charliePlexPair indicatorLED;
+extern charliePlexPair alarmLED;
 
-void indicate();
 void buttonHandler();
 void charlieRender(uint8_t sliceStart, uint8_t sliceEnd);
