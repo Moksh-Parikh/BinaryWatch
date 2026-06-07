@@ -1,6 +1,8 @@
 #include "headers/state.h"
 #include "headers/charliePlexing.h"
+
 #include <stdbool.h>
+#include <avr/io.h>
 
 volatile uint8_t charlieBufferSize = 0;
 volatile uint8_t charlieBufferPos = 0;
@@ -32,34 +34,6 @@ charliePlexPair minuteLEDS[NUMBER_OF_MINUTE_LEDS] = {
 
 charliePlexPair indicatorLED = {3, 4};
 charliePlexPair alarmLED = {4, 3};
-
-void buttonHandler() {
-  DDRB = 0;
-  PORTB = 0;
-  PORTB |= (1 << BUTTONPIN);
-  if (bit_is_clear(PINB, BUTTONPIN)
-  ) {
-    DDRB = 0;
-    PORTB = 0;
-    bool wasHeld = GET_VALUE(clicksAndFlags, BUTTON_HOLD);
-    
-    if (GET_VALUE(clicksAndFlags, CLICK_GAP) < 5) {
-      clicksAndFlags |= (1 << BUTTON_HOLD_OFFSET);
-    }
-    if (!wasHeld)
-      CLEAR_VALUE(clicksAndFlags, CLICK_GAP);
-  }
-  else {
-    uint16_t clickGap = GET_VALUE(clicksAndFlags, CLICK_GAP);
-    if (GET_VALUE(clicksAndFlags, BUTTON_HOLD) &&
-        clickGap >= 1 && clickGap <= 5
-    ) {
-      INCREMENT_CLICKS;
-    }
-
-    CLEAR_VALUE(clicksAndFlags, BUTTON_HOLD);
-  }
-}
 
 void charlieRender(uint8_t sliceStart, uint8_t sliceEnd) {
   if (sliceEnd > charlieBufferSize)

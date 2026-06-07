@@ -2,9 +2,7 @@
 
 #include <stdint.h>
 
+#define TICKS_PER_SEC 23
+
 void modelUpdate(int8_t clicks);
-void rewriteBufferHours(uint8_t hours);
-void rewriteBufferMinutes(uint8_t minutes);
 void incrementDisplayMode();
-void fillBufferWithTime(uint8_t hours, uint8_t minutes);
-void updateTimeBuffer(uint8_t displayMode);

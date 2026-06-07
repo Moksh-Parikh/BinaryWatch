@@ -1,37 +1,41 @@
 #include "headers/model.h"
 #include "headers/state.h"
-#include "headers/charliePlexing.h"
-#include <stdint.h>
+#include "headers/controller.h"
+#include "headers/view.h"
 
-void fillBufferWithTime(uint8_t hours, uint8_t minutes) {
-  uint8_t adjustedHours = hours < NUMBER_OF_HOUR_LEDS ? hours : hours - NUMBER_OF_HOUR_LEDS;
-  
-  charlieBuffer[0] = hourLEDS[adjustedHours];
-  charlieBufferSize = 1;
+#include <avr/interrupt.h>
 
-  for (int i = 0; i < NUMBER_OF_MINUTE_LEDS; i++) {
-    if ( ( minutes & (1 << i) ) == (1 << i) ) {
-      charlieBuffer[charlieBufferSize] = minuteLEDS[i];
-      charlieBufferSize++;
+void checkTimer() {
+    if (timerTime == time) FIRE_ALARM;
+}
+
+ISR(TIMER1_COMPA_vect) {
+  cli();
+
+  INCREMENT_CLICK_GAP;
+  handleClicks();
+
+  if (ticks >= TICKS_PER_SEC - 1) {
+    ticks = 0;
+    INCREMENT_TIME;
+    if (STOPWATCH_RUNNING) {
+        INCREMENT_STOPWATCH_TIME;
+        INDICATE;
+    }
+    uint8_t displayMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
+    
+    if ((GET_VALUE(time, SECONDS) == 0 || GET_VALUE(stopwatchTime, SECONDS) == 0) &&
+        displayMode != TIME_SET && displayMode != TIMER
+    ) {
+      updateTimeBuffer(displayMode);
+      if (timerTime != 0) checkTimer();
     }
   }
+  ticks++;
+
+  sei();
 }
 
-void rewriteBufferMinutes(uint8_t minutes) {
-  charlieBufferSize = BUFFER_MINUTE_OFFSET;
-  for (int i = 0; i < NUMBER_OF_MINUTE_LEDS; i++) {
-    if ( ( minutes & (1 << i) ) == (1 << i) ) {
-      charlieBuffer[charlieBufferSize] = minuteLEDS[i];
-      charlieBufferSize++;
-    }
-  }
-}
-
-void rewriteBufferHours(uint8_t hours) {
-  uint8_t adjustedHours = hours < NUMBER_OF_HOUR_LEDS ? hours : hours - NUMBER_OF_HOUR_LEDS;
-  
-  charlieBuffer[0] = hourLEDS[adjustedHours];
-}
 
 void incrementDisplayMode() {
   uint16_t currentMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
@@ -106,32 +110,5 @@ void modelUpdate(int8_t clicks) {
   else if (clicks == -1) { // hold
     if (ALARM_FIRING) CLEAR_VALUE(otherFlags, ALARM_FLAG);
     else otherFlags ^= STOPWATCH_STATE_MASK;
-  }
-}
-
-void updateTimeBuffer(uint8_t displayMode) {
-  switch (displayMode) {
-    case TIME_SET:
-    case FULL_TIME:
-    case MINUTES_ONLY:
-      fillBufferWithTime(
-        GET_VALUE(time, HOURS),
-        GET_VALUE(time, MINUTES)
-      );
-      break;
-
-    case TIMER:
-      fillBufferWithTime(
-        GET_VALUE(timerTime, HOURS),
-        GET_VALUE(timerTime, MINUTES)
-      );
-      break;
-    
-    case STOPWATCH:
-      fillBufferWithTime(
-        GET_VALUE(stopwatchTime, HOURS),
-        GET_VALUE(stopwatchTime, MINUTES)
-      );
-      break;
   }
 }

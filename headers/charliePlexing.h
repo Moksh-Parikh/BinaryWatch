@@ -1,13 +1,11 @@
 #pragma once
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#include <stdint.h>
 
 #define NUMBER_OF_HOUR_LEDS 12
 #define NUMBER_OF_MINUTE_LEDS 6
 #define CHARLIE_BUFFER_MAX_SIZE NUMBER_OF_HOUR_LEDS + NUMBER_OF_MINUTE_LEDS + 1
 
-#define BUTTONPIN PB3
 #define APPEND_CHARLIEBUFFER(val) charlieBuffer[charlieBufferSize++] = (val);
 
 #define BUFFER_MINUTE_OFFSET 1
