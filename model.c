@@ -1,6 +1,7 @@
 #include "headers/model.h"
 #include "headers/state.h"
 #include "headers/charliePlexing.h"
+#include <stdint.h>
 
 void fillBufferWithTime(uint8_t hours, uint8_t minutes) {
   uint8_t adjustedHours = hours < NUMBER_OF_HOUR_LEDS ? hours : hours - NUMBER_OF_HOUR_LEDS;
@@ -41,7 +42,10 @@ void incrementDisplayMode() {
   switch (currentMode) {
     case FULL_TIME:
     case MINUTES_ONLY:
-      updateTimeBuffer();
+    case TIME_SET:
+    case TIMER:
+      updateTimeBuffer(currentMode);
+      INDICATE;
       break;
     default:
       break;
@@ -55,31 +59,46 @@ void modelUpdate(int8_t clicks, uint8_t clickGap) {
     CLEAR_VALUE(otherFlags, INDICATION_FLAG);
   }
   else if (clicks > 0) {
+    uint8_t displayMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
+
     switch (clicks) {
       case 1:
-        if (GET_VALUE(clicksAndFlags, DISPLAY_MODE) == TIME_SET) {
-          INCREMENT_MINUTES;
-          updateTimeBuffer();
+        if (displayMode == TIME_SET || displayMode == TIMER) {
+          switch (GET_VALUE(otherFlags, TIME_SET_FIELD)) {
+              case 0:
+                  if (displayMode == TIME_SET) INCREMENT_MINUTES;
+                  else INCREMENT_MINUTES_TIMER;
+                  break;
+              case 1:
+                  if (displayMode == TIME_SET) INCREMENT_HOURS;
+                  else INCREMENT_HOURS_TIMER;
+                  break;
+          }
+          updateTimeBuffer(displayMode);
         }
         else {
           TOGGLE_DISPLAY_STATE;
         }
+
         break;
       case 2:
-        if (GET_VALUE(clicksAndFlags, DISPLAY_MODE) == TIME_SET) {
-          INCREMENT_HOURS;
-          updateTimeBuffer();
+        if (displayMode == TIME_SET || displayMode == TIMER) {
+          switch (GET_VALUE(otherFlags, TIME_SET_FIELD)) {
+              case 0:
+                  otherFlags |= TIME_SET_FIELD_MASK;
+                  break;
+              case 1:
+                  CLEAR_VALUE(otherFlags, TIME_SET_FIELD);
+                  incrementDisplayMode();
+                  break;
+            }
         }
         else {
           incrementDisplayMode();
         }
+        
         break;
       case 3:
-        if (GET_VALUE(clicksAndFlags, DISPLAY_MODE) == TIME_SET) {
-          incrementDisplayMode();
-        }
-        break;
-      case 5:
         clicksAndFlags &= ~DISPLAY_MODE_MASK;
         break;
     }
@@ -87,13 +106,26 @@ void modelUpdate(int8_t clicks, uint8_t clickGap) {
   }
   else if (clicks == -1) { // hold
     INDICATE;
-    clicksAndFlags &= ~DISPLAY_MODE_MASK;
+    clicksAndFlags &= ~DISPLAY_MODE_MASK; // will now start a stopwatch/stop an alarm
   }
 }
 
-void updateTimeBuffer() {
-  fillBufferWithTime(
-    GET_VALUE(time, HOURS),
-    GET_VALUE(time, MINUTES)
-  );
+void updateTimeBuffer(uint8_t displayMode) {
+  switch (displayMode) {
+    case TIME_SET:
+    case FULL_TIME:
+    case MINUTES_ONLY:
+      fillBufferWithTime(
+        GET_VALUE(time, HOURS),
+        GET_VALUE(time, MINUTES)
+      );
+      break;
+
+    case TIMER:
+      fillBufferWithTime(
+        GET_VALUE(timerTime, HOURS),
+        GET_VALUE(timerTime, MINUTES)
+      );
+      break;
+  }
 }

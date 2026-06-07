@@ -47,7 +47,7 @@
 // second bit for alarmLED
 // third bit for stopwatch state
 // fourth bit for timer
-
+// fifth bit for minutes/hours set
 
 #define INDICATION_FLAG_MASK 0x1 //(1)
 #define INDICATION_FLAG_OFFSET 0
@@ -60,6 +60,9 @@
 
 #define IS_TIMER_MASK 0x8 //(1 << 3)
 #define IS_TIMER_OFFSET 3
+
+#define TIME_SET_FIELD_MASK 0x10 // (1 << 4)
+#define TIME_SET_FIELD_OFFSET 4
 
 #define GET_VALUE(x, y) ((x) & y##_MASK) >> (y##_OFFSET)
 #define CLEAR_VALUE(x, y) (x) &= ~(y##_MASK)
@@ -89,19 +92,33 @@
                (_m << MINUTES_OFFSET)  |                     \
                (_s << SECONDS_OFFSET);
 
-#define INCREMENT_MINUTES uint16_t _m = GET_VALUE(time, MINUTES);         \
+#define INCREMENT_MINUTES do { uint16_t _m = GET_VALUE(time, MINUTES);         \
                                   if (++_m >= 60) {                       \
                                       _m = 0;                             \
                                   }                                       \
                                   time &= ~MINUTES_MASK;                  \
-                                  time |= (_m << MINUTES_OFFSET);
+                                  time |= (_m << MINUTES_OFFSET); } while(0)
 
-#define INCREMENT_HOURS uint16_t _h = GET_VALUE(time, HOURS);             \
+#define INCREMENT_HOURS do { uint16_t _h = GET_VALUE(time, HOURS);             \
                                   if (++_h >= 12) {                       \
                                       _h = 0;                             \
                                   }                                       \
                                   time &= ~HOURS_MASK;                    \
-                                  time |= (_h << HOURS_OFFSET);
+                                  time |= (_h << HOURS_OFFSET); } while(0)
+
+#define INCREMENT_MINUTES_TIMER do { uint16_t __m = GET_VALUE(timerTime, MINUTES);         \
+                                  if (++__m >= 60) {                       \
+                                      __m = 0;                             \
+                                  }                                       \
+                                  timerTime &= ~MINUTES_MASK;                  \
+                                  timerTime |= (__m << MINUTES_OFFSET); } while(0)
+
+#define INCREMENT_HOURS_TIMER do { uint16_t __h = GET_VALUE(timerTime, HOURS);             \
+                                  if (++__h >= 12) {                       \
+                                      __h = 0;                             \
+                                  }                                       \
+                                  timerTime &= ~HOURS_MASK;                    \
+                                  timerTime |= (__h << HOURS_OFFSET); } while(0)
 
 #define INCREMENT_CLICKS uint16_t c = GET_VALUE(clicksAndFlags, CLICKS); \
                         clicksAndFlags &= ~CLICKS_MASK;                  \

@@ -66,15 +66,13 @@ ISR(TIMER1_COMPA_vect) {
     ticks = 0;
     CLEAR_VALUE(otherFlags, ALARM_FLAG);
     INCREMENT_TIME;
-    // uint8_t displayMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
+    uint8_t displayMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
     
     if (GET_VALUE(time, SECONDS) == 0 &&
-        GET_VALUE(clicksAndFlags, DISPLAY_MODE) != TIME_SET
+        displayMode != TIME_SET && displayMode != TIMER
     ) {
-      updateTimeBuffer();
-      if (timerTime != 0) {
-        checkTimer();
-      }
+      updateTimeBuffer(displayMode);
+      if (timerTime != 0) checkTimer();
     }
   }
   ticks++;
@@ -96,6 +94,7 @@ ISR(TIMER0_COMPA_vect) {
         break;
       case TIME_SET:
       case FULL_TIME:
+      case TIMER:
         charlieRender(0, charlieBufferSize);
         break;
       case EXTRA2:

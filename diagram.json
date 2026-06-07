@@ -122,10 +122,17 @@
       "attrs": { "value": "250" }
     },
     {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": -111.25,
+      "left": -124.8,
+      "attrs": { "value": "250" }
+    },
+    {
       "type": "wokwi-led",
       "id": "led20",
-      "top": -186,
-      "left": 224.6,
+      "top": -176.4,
+      "left": 234.2,
       "attrs": { "color": "red" }
     }
   ],
@@ -151,7 +158,6 @@
     [ "tiny:PB1", "led1:A", "white", [ "v0" ] ],
     [ "tiny:PB2", "led9:A", "violet", [ "v0" ] ],
     [ "tiny:PB4", "led12:C", "red", [ "v134.4", "h-29.6" ] ],
-    [ "tiny:PB3", "led1:C", "orange", [ "v19.2", "h-96.4" ] ],
     [ "tiny:PB2", "led2:C", "violet", [ "h-29.2", "v39.6", "h-115.6" ] ],
     [ "led14:C", "led13:A", "green", [ "v38.4", "h29.2" ] ],
     [ "led14:A", "led13:C", "green", [ "v28.8", "h19.2" ] ],
@@ -160,18 +166,19 @@
     [ "led16:C", "led15:A", "green", [ "v38.4", "h29.2" ] ],
     [ "led16:A", "led15:C", "green", [ "v28.8", "h19.2" ] ],
     [ "tiny:PB2", "led16:C", "violet", [ "h-10", "v58.8", "h-48", "v57.6" ] ],
-    [ "tiny:PB3", "led16:A", "orange", [ "v38.4", "h-29.2" ] ],
     [ "led18:C", "led17:A", "green", [ "v38.4", "h29.2" ] ],
     [ "led18:A", "led17:C", "green", [ "v28.8", "h19.2" ] ],
     [ "tiny:PB2", "led18:C", "violet", [ "h-19.6", "v58.8", "h-105.6", "v57.6" ] ],
     [ "tiny:PB4", "led18:A", "red", [ "v38.4", "h-106.4" ] ],
     [ "tiny:PB4", "led19:C", "red", [ "h37.6", "v-153.6", "h57.6", "v76.8", "h66.8" ] ],
-    [ "tiny:PB3", "led19:A", "orange", [ "v19.2", "h191.6", "v-124.8" ] ],
     [ "btn1:2.r", "tiny:GND", "gray", [ "h86.6", "v86.6", "h-307.2", "v-28.8" ] ],
-    [ "tiny:PB3", "r1:2", "orange", [ "v86.4", "h230", "v48" ] ],
-    [ "btn1:1.l", "r1:2", "cyan", [ "h-28.8" ] ],
-    [ "led19:A", "led20:C", "green", [ "v9.6", "h48" ] ],
-    [ "led19:C", "led20:A", "green", [ "v19.2", "h67.6" ] ]
+    [ "tiny:PB3", "r1:2", "orange", [ "h18.8", "v86.4", "h211.2", "v57.6" ] ],
+    [ "tiny:PB3", "r2:1", "orange", [ "v19.2", "h-115.6", "v-76.8", "h-19.2" ] ],
+    [ "tiny:PB3", "led16:A", "orange", [ "v48", "h-29.2" ] ],
+    [ "led19:A", "tiny:PB3", "orange", [ "v115.2", "h-182.4", "v28.8" ] ],
+    [ "btn1:1.l", "led19:A", "cyan", [ "h-28.8", "v-28.8", "h-9.6" ] ],
+    [ "led19:A", "led20:C", "green", [ "v19.2", "h48" ] ],
+    [ "led19:C", "led20:A", "green", [ "v-48", "h77.2" ] ]
   ],
   "dependencies": {}
 }
