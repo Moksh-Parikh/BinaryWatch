@@ -2,17 +2,16 @@
 #include "headers/charliePlexing.h"
 #include "headers/model.h"
 
-#include <stdint.h>
-
 #define TICKS_PER_SEC 23
 
 #define DEFAULT_FLAGS (FULL_TIME << DISPLAY_MODE_OFFSET) | \
                       (1 << DISPLAY_STATE_OFFSET)
 
 volatile uint16_t clicksAndFlags = 0;
-volatile uint8_t otherFlags = 0;
 volatile uint16_t time = 0;
 volatile uint16_t timerTime = 0;
+volatile uint16_t stopwatchTime = 0;
+volatile uint8_t otherFlags = 0;
 volatile int ticks = 0;
 
 void removeElement(charliePlexPair value) {
@@ -44,10 +43,10 @@ void handleClicks() {
       if (clickGap >= CLICK_CLEAR_GAP) {
         CLEAR_VALUE(clicksAndFlags, CLICKS);
       }
-      modelUpdate(clicks, clickGap);
+      if (clickGap >= MAX_CLICK_GAP) modelUpdate(clicks);
       break;
     case 1:
-      if (clicks == 0) modelUpdate(-1, clickGap);
+      if (clicks == 0 && clickGap == MAX_CLICK_GAP) modelUpdate(-1);
       break;
   }
 }
@@ -64,11 +63,14 @@ ISR(TIMER1_COMPA_vect) {
 
   if (ticks >= TICKS_PER_SEC - 1) {
     ticks = 0;
-    CLEAR_VALUE(otherFlags, ALARM_FLAG);
     INCREMENT_TIME;
+    if (STOPWATCH_RUNNING) {
+        INCREMENT_STOPWATCH_TIME;
+        INDICATE;
+    }
     uint8_t displayMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
     
-    if (GET_VALUE(time, SECONDS) == 0 &&
+    if ((GET_VALUE(time, SECONDS) == 0 || GET_VALUE(stopwatchTime, SECONDS) == 0) &&
         displayMode != TIME_SET && displayMode != TIMER
     ) {
       updateTimeBuffer(displayMode);
@@ -95,9 +97,9 @@ ISR(TIMER0_COMPA_vect) {
       case TIME_SET:
       case FULL_TIME:
       case TIMER:
+      case STOPWATCH:
         charlieRender(0, charlieBufferSize);
         break;
-      case EXTRA2:
       default:
         buttonHandler();
         break;

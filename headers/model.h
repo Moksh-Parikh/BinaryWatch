@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-void modelUpdate(int8_t clicks, uint8_t clickGap);
+void modelUpdate(int8_t clicks);
 void rewriteBufferHours(uint8_t hours);
 void rewriteBufferMinutes(uint8_t minutes);
 void incrementDisplayMode();

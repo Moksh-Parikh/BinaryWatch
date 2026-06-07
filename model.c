@@ -35,7 +35,7 @@ void rewriteBufferHours(uint8_t hours) {
 
 void incrementDisplayMode() {
   uint16_t currentMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
-  currentMode = currentMode < 3 ? currentMode + 1 : 0;
+  currentMode = currentMode < (NUMBER_OF_MODES - 1) ? currentMode + 1 : 0;
   clicksAndFlags &= ~DISPLAY_MODE_MASK;
   clicksAndFlags |= (currentMode << DISPLAY_MODE_OFFSET);
 
@@ -44,17 +44,16 @@ void incrementDisplayMode() {
     case MINUTES_ONLY:
     case TIME_SET:
     case TIMER:
+    case STOPWATCH:
       updateTimeBuffer(currentMode);
-      INDICATE;
+      // INDICATE;
       break;
     default:
       break;
   }
 }
 
-void modelUpdate(int8_t clicks, uint8_t clickGap) {
-  if (clickGap < MAX_CLICK_GAP) return;
-
+void modelUpdate(int8_t clicks) {
   if (clicks == 0) {
     CLEAR_VALUE(otherFlags, INDICATION_FLAG);
   }
@@ -105,8 +104,8 @@ void modelUpdate(int8_t clicks, uint8_t clickGap) {
     CLEAR_VALUE(clicksAndFlags, CLICKS);
   }
   else if (clicks == -1) { // hold
-    INDICATE;
-    clicksAndFlags &= ~DISPLAY_MODE_MASK; // will now start a stopwatch/stop an alarm
+    if (ALARM_FIRING) CLEAR_VALUE(otherFlags, ALARM_FLAG);
+    else otherFlags ^= STOPWATCH_STATE_MASK;
   }
 }
 
@@ -125,6 +124,13 @@ void updateTimeBuffer(uint8_t displayMode) {
       fillBufferWithTime(
         GET_VALUE(timerTime, HOURS),
         GET_VALUE(timerTime, MINUTES)
+      );
+      break;
+    
+    case STOPWATCH:
+      fillBufferWithTime(
+        GET_VALUE(stopwatchTime, HOURS),
+        GET_VALUE(stopwatchTime, MINUTES)
       );
       break;
   }
