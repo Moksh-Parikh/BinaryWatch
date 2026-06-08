@@ -1,5 +1,5 @@
-#include "headers/state.h"
-#include "headers/view.h"
+#include "state.h"
+#include "view/view.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>

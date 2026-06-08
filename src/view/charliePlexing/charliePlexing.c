@@ -1,5 +1,5 @@
-#include "headers/state.h"
-#include "headers/charliePlexing.h"
+#include "../../state.h"
+#include "charliePlexing.h"
 
 #include <stdbool.h>
 #include <avr/io.h>

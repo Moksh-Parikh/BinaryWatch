@@ -1,5 +1,5 @@
-#include "headers/charliePlexing.h"
-#include "headers/state.h"
+#include "charliePlexing/charliePlexing.h"
+#include "../state.h"
 
 #include <avr/interrupt.h>
 

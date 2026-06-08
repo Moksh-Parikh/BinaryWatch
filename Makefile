@@ -18,14 +18,14 @@ SIZE    := avr-size
 # Directories
 # ============================================================================
 
-SRC_DIR := .
-OBJ_DIR := build
+SRC_DIR := ./src
+OBJ_DIR := ./build
 
 # ============================================================================
 # Source Files
 # ============================================================================
 
-SRCS := $(wildcard $(SRC_DIR)/*.c)
+SRCS := $(shell find $(SRC_DIR) -type f -name '*.c')
 
 OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 DEPS := $(OBJS:.o=.d)
@@ -70,11 +70,9 @@ $(TARGET).eep: $(TARGET).elf
 # Compilation
 # ============================================================================
 
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
 # ============================================================================
 # Cleanup

@@ -1,6 +1,6 @@
-#include "headers/controller.h"
-#include "headers/state.h"
-#include "headers/model.h"
+#include "controller.h"
+#include "../state.h"
+#include "../model/model.h"
 
 #include <stdbool.h>
 #include <avr/io.h>

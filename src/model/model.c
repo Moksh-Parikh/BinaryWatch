@@ -1,7 +1,7 @@
-#include "headers/model.h"
-#include "headers/state.h"
-#include "headers/controller.h"
-#include "headers/view.h"
+#include "model.h"
+#include "../state.h"
+#include "../controller/controller.h"
+#include "../view/view.h"
 
 #include <avr/interrupt.h>
 
