@@ -45,7 +45,6 @@
 #define CLICKS_MASK 0xF // (15) lower 4 bits
 #define CLICKS_OFFSET 0
 
-
 // FLAGSET3 STRUCTURE
 // 000 0 0 0 0 0
 // Lower bit for indicatorLED
@@ -53,7 +52,6 @@
 // third bit for stopwatch state
 // fourth bit for timer
 // fifth bit for minutes/hours set
-// sixth bit for stopwatch state
 
 #define INDICATION_FLAG_MASK 0x1 // (1)
 #define INDICATION_FLAG_OFFSET 0
@@ -61,17 +59,14 @@
 #define ALARM_FLAG_MASK 0x2 // (1 << 1)
 #define ALARM_FLAG_OFFSET 1
 
-#define IS_STOPWATCH_MASK 0x4 // (1 << 2)
-#define IS_STOPWATCH_OFFSET 2
+#define STOPWATCH_STATE_MASK 0x4 // (1 << 2)
+#define STOPWATCH_STATE_OFFSET 2
 
 #define IS_TIMER_MASK 0x8 // (1 << 3)
 #define IS_TIMER_OFFSET 3
 
 #define TIME_SET_FIELD_MASK 0x10 // (1 << 4)
 #define TIME_SET_FIELD_OFFSET 4
-
-#define STOPWATCH_STATE_MASK 0x20 // (1 << 5)
-#define STOPWATCH_STATE_OFFSET 5
 
 #define GET_VALUE(x, y) ((x) & y##_MASK) >> (y##_OFFSET)
 #define CLEAR_VALUE(x, y) (x) &= ~(y##_MASK)
