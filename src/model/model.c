@@ -36,6 +36,14 @@ ISR(TIMER1_COMPA_vect) {
   sei();
 }
 
+void setDisplayStateOff() {
+    cli();
+    DDRB = 0;
+    PORTB = 0;
+    TIMSK &= ~(1 << OCIE0A);
+    ENABLE_BUTTON_INTERRUPTS;
+    sei();
+}
 
 void incrementDisplayMode() {
   uint8_t currentMode = GET_VALUE(flagSet2, DISPLAY_MODE);
@@ -50,7 +58,6 @@ void incrementDisplayMode() {
     case TIMER:
     case STOPWATCH:
       updateTimeBuffer(currentMode);
-      // INDICATE;
       break;
     default:
       break;
@@ -80,7 +87,7 @@ void modelUpdate(int8_t clicks) {
           updateTimeBuffer(displayMode);
         }
         else {
-          TOGGLE_DISPLAY_STATE;
+          setDisplayStateOff();
         }
 
         break;

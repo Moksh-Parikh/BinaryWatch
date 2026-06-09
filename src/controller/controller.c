@@ -2,9 +2,20 @@
 #include "../state.h"
 #include "../model/model.h"
 
-#include <stdbool.h>
-#include <avr/io.h>
 #include <stdint.h>
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(PCINT0_vect) {
+    cli();
+    DISABLE_BUTTON_INTERRUPTS;
+    DDRB = 0;
+    PORTB = 0;
+    TIMSK |= (1 << OCIE0A);
+    flagSet2 |= MAGIC_CLICKS;
+    sei();
+}
 
 void buttonHandler() {
   DDRB = 0;
@@ -14,7 +25,7 @@ void buttonHandler() {
   ) {
     DDRB = 0;
     PORTB = 0;
-    bool wasHeld = GET_VALUE(flagSet1, BUTTON_HOLD);
+    uint8_t wasHeld = GET_VALUE(flagSet1, BUTTON_HOLD);
     
     if (GET_VALUE(flagSet1, CLICK_GAP) < 5) {
       flagSet1 |= (1 << BUTTON_HOLD_OFFSET);

@@ -7,27 +7,20 @@
 ISR(TIMER0_COMPA_vect) {
   cli();
 
-  if (GET_VALUE(flagSet2, DISPLAY_STATE)) {
-    // fillBufferWithTime(
-    //   GET_VALUE(flagSet2, CLICKS),
-    //   GET_VALUE(flagSet1, CLICK_GAP)
-    // );
-    switch (GET_VALUE(flagSet2, DISPLAY_MODE)) {
-      case MINUTES_ONLY:
-        charlieRender(1, charlieBufferSize);
-        break;
-      case TIME_SET:
-      case FULL_TIME:
-      case TIMER:
-      case STOPWATCH:
-        charlieRender(0, charlieBufferSize);
-        break;
-      default:
-        buttonHandler();
-        break;
-    }
+  switch (GET_VALUE(flagSet2, DISPLAY_MODE)) {
+    case MINUTES_ONLY:
+      charlieRender(1, charlieBufferSize);
+      break;
+    case TIME_SET:
+    case FULL_TIME:
+    case TIMER:
+    case STOPWATCH:
+      charlieRender(0, charlieBufferSize);
+      break;
+    default:
+      buttonHandler();
+      break;
   }
-  else buttonHandler();
 
   sei();
 }

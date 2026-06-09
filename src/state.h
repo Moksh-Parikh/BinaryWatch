@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 
+#define MAGIC_CLICKS 6
 #define MAX_CLICK_GAP 6
 #define CLICK_CLEAR_GAP 14
 
@@ -35,9 +36,6 @@
 // upper bit for DISPLAY_STATE
 // next 3 for DISPLAY_MODE
 // bottom 4 for click number
-
-#define DISPLAY_STATE_MASK 0x80 // (1 << 7) upper bit
-#define DISPLAY_STATE_OFFSET 7
 
 #define DISPLAY_MODE_MASK 0x70 // (7 << 4)
 #define DISPLAY_MODE_OFFSET 4
@@ -151,11 +149,12 @@
                          flagSet1 &= ~CLICK_GAP_MASK;                                 \
                          flagSet1 |= (f << CLICK_GAP_OFFSET);
 
-#define TOGGLE_DISPLAY_STATE \
-    (flagSet2 ^= DISPLAY_STATE_MASK)
+#define ENABLE_BUTTON_INTERRUPTS PORTB |= (1 << BUTTONPIN); \
+                                 GIMSK |= (1 << PCIE);\
+                                 PCMSK |= (1 << BUTTONPIN);
 
-#define SET_DISPLAY_MODE(x) clicksAndFlags &= ~DISPLAY_MODE_MASK;           \
-                            clicksAndFlags |= ((x) << DISPLAY_MODE_OFFSET);
+#define DISABLE_BUTTON_INTERRUPTS GIMSK &= ~(1 << PCIE); \
+                                  PCMSK &= ~(1 << BUTTONPIN);
 
 #define NUMBER_OF_MODES 5
 

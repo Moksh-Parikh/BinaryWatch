@@ -5,8 +5,7 @@
 #include <avr/interrupt.h>
 #include <stdint.h>
 
-#define DEFAULT_FLAGS (FULL_TIME << DISPLAY_MODE_OFFSET) | \
-                      (1 << DISPLAY_STATE_OFFSET)
+#define DEFAULT_FLAGS (FULL_TIME << DISPLAY_MODE_OFFSET)
 
 volatile uint8_t flagSet1 = 0, flagSet2 = 0, flagSet3 = 0;
 volatile uint16_t time = 0;
