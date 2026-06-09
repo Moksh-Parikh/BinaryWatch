@@ -22,7 +22,7 @@ ISR(TIMER1_COMPA_vect) {
         INCREMENT_STOPWATCH_TIME;
         INDICATE;
     }
-    uint8_t displayMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
+    uint8_t displayMode = GET_VALUE(flagSet2, DISPLAY_MODE);
     
     if ((GET_VALUE(time, SECONDS) == 0 || GET_VALUE(stopwatchTime, SECONDS) == 0) &&
         displayMode != TIME_SET && displayMode != TIMER
@@ -38,10 +38,10 @@ ISR(TIMER1_COMPA_vect) {
 
 
 void incrementDisplayMode() {
-  uint8_t currentMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
+  uint8_t currentMode = GET_VALUE(flagSet2, DISPLAY_MODE);
   currentMode = currentMode < (NUMBER_OF_MODES - 1) ? currentMode + 1 : 0;
-  clicksAndFlags &= ~DISPLAY_MODE_MASK;
-  clicksAndFlags |= (currentMode << DISPLAY_MODE_OFFSET);
+  flagSet2 &= ~DISPLAY_MODE_MASK;
+  flagSet2 |= (currentMode << DISPLAY_MODE_OFFSET);
 
   switch (currentMode) {
     case FULL_TIME:
@@ -59,15 +59,15 @@ void incrementDisplayMode() {
 
 void modelUpdate(int8_t clicks) {
   if (clicks == 0) {
-    CLEAR_VALUE(otherFlags, INDICATION_FLAG);
+    CLEAR_VALUE(flagSet3, INDICATION_FLAG);
   }
   else if (clicks > 0) {
-    uint8_t displayMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
+    uint8_t displayMode = GET_VALUE(flagSet2, DISPLAY_MODE);
 
     switch (clicks) {
       case 1:
         if (displayMode == TIME_SET || displayMode == TIMER) {
-          switch (GET_VALUE(otherFlags, TIME_SET_FIELD)) {
+          switch (GET_VALUE(flagSet3, TIME_SET_FIELD)) {
               case 0:
                   if (displayMode == TIME_SET) INCREMENT_MINUTES;
                   else INCREMENT_MINUTES_TIMER;
@@ -86,12 +86,12 @@ void modelUpdate(int8_t clicks) {
         break;
       case 2:
         if (displayMode == TIME_SET || displayMode == TIMER) {
-          switch (GET_VALUE(otherFlags, TIME_SET_FIELD)) {
+          switch (GET_VALUE(flagSet3, TIME_SET_FIELD)) {
               case 0:
-                  otherFlags |= TIME_SET_FIELD_MASK;
+                  flagSet3 |= TIME_SET_FIELD_MASK;
                   break;
               case 1:
-                  CLEAR_VALUE(otherFlags, TIME_SET_FIELD);
+                  CLEAR_VALUE(flagSet3, TIME_SET_FIELD);
                   incrementDisplayMode();
                   break;
             }
@@ -102,13 +102,13 @@ void modelUpdate(int8_t clicks) {
         
         break;
       case 3:
-        clicksAndFlags &= ~DISPLAY_MODE_MASK;
+        flagSet2 &= ~DISPLAY_MODE_MASK;
         break;
     }
-    CLEAR_VALUE(clicksAndFlags, CLICKS);
+    CLEAR_VALUE(flagSet2, CLICKS);
   }
   else if (clicks == -1) { // hold
-    if (ALARM_FIRING) CLEAR_VALUE(otherFlags, ALARM_FLAG);
-    else otherFlags ^= STOPWATCH_STATE_MASK;
+    if (ALARM_FIRING) CLEAR_VALUE(flagSet3, ALARM_FLAG);
+    else flagSet3 ^= STOPWATCH_STATE_MASK;
   }
 }

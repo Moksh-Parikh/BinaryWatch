@@ -2,16 +2,17 @@
 #include "../state.h"
 
 #include <avr/interrupt.h>
+#include <stdint.h>
 
 ISR(TIMER0_COMPA_vect) {
   cli();
 
-  if (GET_VALUE(clicksAndFlags, DISPLAY_STATE)) {
+  if (GET_VALUE(flagSet2, DISPLAY_STATE)) {
     // fillBufferWithTime(
-    //   GET_VALUE(clicksAndFlags, CLICKS),
-    //   GET_VALUE(clicksAndFlags, CLICK_GAP)
+    //   GET_VALUE(flagSet2, CLICKS),
+    //   GET_VALUE(flagSet1, CLICK_GAP)
     // );
-    switch (GET_VALUE(clicksAndFlags, DISPLAY_MODE)) {
+    switch (GET_VALUE(flagSet2, DISPLAY_MODE)) {
       case MINUTES_ONLY:
         charlieRender(1, charlieBufferSize);
         break;
@@ -37,7 +38,7 @@ void fillBufferWithTime(uint8_t hours, uint8_t minutes) {
   charlieBuffer[0] = hourLEDS[adjustedHours];
   charlieBufferSize = 1;
 
-  for (int i = 0; i < NUMBER_OF_MINUTE_LEDS; i++) {
+  for (uint8_t i = 0; i < NUMBER_OF_MINUTE_LEDS; i++) {
     if ((minutes >> i) & 1) {
       charlieBuffer[charlieBufferSize] = minuteLEDS[i];
       charlieBufferSize++;
@@ -47,7 +48,7 @@ void fillBufferWithTime(uint8_t hours, uint8_t minutes) {
 
 void rewriteBufferMinutes(uint8_t minutes) {
   charlieBufferSize = BUFFER_MINUTE_OFFSET;
-  for (int i = 0; i < NUMBER_OF_MINUTE_LEDS; i++) {
+  for (uint8_t i = 0; i < NUMBER_OF_MINUTE_LEDS; i++) {
     if ((minutes >> i) & 1) {
       charlieBuffer[charlieBufferSize] = minuteLEDS[i];
       charlieBufferSize++;

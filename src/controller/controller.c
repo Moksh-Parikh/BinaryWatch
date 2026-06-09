@@ -14,34 +14,34 @@ void buttonHandler() {
   ) {
     DDRB = 0;
     PORTB = 0;
-    bool wasHeld = GET_VALUE(clicksAndFlags, BUTTON_HOLD);
+    bool wasHeld = GET_VALUE(flagSet1, BUTTON_HOLD);
     
-    if (GET_VALUE(clicksAndFlags, CLICK_GAP) < 5) {
-      clicksAndFlags |= (1 << BUTTON_HOLD_OFFSET);
+    if (GET_VALUE(flagSet1, CLICK_GAP) < 5) {
+      flagSet1 |= (1 << BUTTON_HOLD_OFFSET);
     }
     if (!wasHeld)
-      CLEAR_VALUE(clicksAndFlags, CLICK_GAP);
+      CLEAR_VALUE(flagSet1, CLICK_GAP);
   }
   else {
-    uint16_t clickGap = GET_VALUE(clicksAndFlags, CLICK_GAP);
-    if (GET_VALUE(clicksAndFlags, BUTTON_HOLD) &&
+    uint8_t clickGap = GET_VALUE(flagSet1, CLICK_GAP);
+    if (GET_VALUE(flagSet1, BUTTON_HOLD) &&
         clickGap >= 1 && clickGap <= 5
     ) {
       INCREMENT_CLICKS;
     }
 
-    CLEAR_VALUE(clicksAndFlags, BUTTON_HOLD);
+    CLEAR_VALUE(flagSet1, BUTTON_HOLD);
   }
 }
 
 void handleClicks() {
-  uint8_t clickGap = GET_VALUE(clicksAndFlags, CLICK_GAP);
-  uint8_t clicks = GET_VALUE(clicksAndFlags, CLICKS);
+  uint8_t clickGap = GET_VALUE(flagSet1, CLICK_GAP);
+  uint8_t clicks = GET_VALUE(flagSet2, CLICKS);
 
-  switch (GET_VALUE(clicksAndFlags, BUTTON_HOLD)) {
+  switch (GET_VALUE(flagSet1, BUTTON_HOLD)) {
     case 0:
       if (clickGap >= CLICK_CLEAR_GAP) {
-        CLEAR_VALUE(clicksAndFlags, CLICKS);
+        CLEAR_VALUE(flagSet2, CLICKS);
       }
       if (clickGap >= MAX_CLICK_GAP) modelUpdate(clicks);
       break;

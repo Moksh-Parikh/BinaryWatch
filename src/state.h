@@ -19,29 +19,34 @@
 #define MINUTES_OFFSET 6
 #define SECONDS_OFFSET 0
 
-// FLAG PACKING STRUCTURE
-// 0 0 000 0000000 0000
-// top 2 for DISPLAY_STATE and BUTTON_HOLD
+// FLAGSET1 PACKING STRUCTURE
+// 0 0000000
+// lower 7 for click gap
+// upper bit for BUTTON_HOLD
+
+#define BUTTON_HOLD_MASK 0x80 // (1 << 7) upper bit
+#define BUTTON_HOLD_OFFSET 7
+
+#define CLICK_GAP_MASK 0x7F // 127 
+#define CLICK_GAP_OFFSET 0
+
+// FLAGSET2 PACKING STRUCTURE
+// 0 000 0000
+// upper bit for DISPLAY_STATE
 // next 3 for DISPLAY_MODE
-// middle 7 for click gap
 // bottom 4 for click number
 
-#define DISPLAY_STATE_MASK 0x8000 // (1 << 15) upper bit
-#define DISPLAY_STATE_OFFSET 15
+#define DISPLAY_STATE_MASK 0x80 // (1 << 7) upper bit
+#define DISPLAY_STATE_OFFSET 7
 
-#define BUTTON_HOLD_MASK 0x4000 // (1 << 14) second from top
-#define BUTTON_HOLD_OFFSET 14
-
-#define DISPLAY_MODE_MASK 0x3800 // (7 << 11)
-#define DISPLAY_MODE_OFFSET 11
+#define DISPLAY_MODE_MASK 0x70 // (7 << 4)
+#define DISPLAY_MODE_OFFSET 4
 
 #define CLICKS_MASK 0xF // (15) lower 4 bits
 #define CLICKS_OFFSET 0
 
-#define CLICK_GAP_MASK 0x7F0 // (127 << 4) 
-#define CLICK_GAP_OFFSET 4
 
-// EXTRA FLAGS STRUCTURE
+// FLAGSET3 STRUCTURE
 // 000 0 0 0 0 0
 // Lower bit for indicatorLED
 // second bit for alarmLED
@@ -71,14 +76,14 @@
 #define GET_VALUE(x, y) ((x) & y##_MASK) >> (y##_OFFSET)
 #define CLEAR_VALUE(x, y) (x) &= ~(y##_MASK)
 
-#define IS_TIMER GET_VALUE(otherFlags, IS_TIMER)
-#define IS_STOPWATCH GET_VALUE(otherFlags, IS_STOPWATCH)
-#define INDICATING GET_VALUE(otherFlags, INDICATION_FLAG)
-#define ALARM_FIRING GET_VALUE(otherFlags, ALARM_FLAG)
-#define STOPWATCH_RUNNING GET_VALUE(otherFlags, STOPWATCH_STATE)
+#define IS_TIMER GET_VALUE(flagSet3, IS_TIMER)
+#define IS_STOPWATCH GET_VALUE(flagSet3, IS_STOPWATCH)
+#define INDICATING GET_VALUE(flagSet3, INDICATION_FLAG)
+#define ALARM_FIRING GET_VALUE(flagSet3, ALARM_FLAG)
+#define STOPWATCH_RUNNING GET_VALUE(flagSet3, STOPWATCH_STATE)
 
-#define INDICATE otherFlags |= (1 << INDICATION_FLAG_OFFSET);
-#define FIRE_ALARM otherFlags |= (1 << ALARM_FLAG_OFFSET);
+#define INDICATE flagSet3 |= (1 << INDICATION_FLAG_OFFSET);
+#define FIRE_ALARM flagSet3 |= (1 << ALARM_FLAG_OFFSET);
 
 #define INCREMENT_TIME do { uint16_t _h = GET_VALUE(time, HOURS); \
         uint16_t _m = GET_VALUE(time, MINUTES);              \
@@ -142,17 +147,17 @@
                                   timerTime &= ~HOURS_MASK;                    \
                                   timerTime |= (__h << HOURS_OFFSET); } while(0)
 
-#define INCREMENT_CLICKS uint16_t c = GET_VALUE(clicksAndFlags, CLICKS); \
-                        clicksAndFlags &= ~CLICKS_MASK;                  \
-                        clicksAndFlags |= c <= (0xF - 1) ? c + 1 : c;
+#define INCREMENT_CLICKS uint8_t c = GET_VALUE(flagSet2, CLICKS); \
+                        flagSet2 &= ~CLICKS_MASK;                  \
+                        flagSet2 |= c <= (0xF - 1) ? c + 1 : c;
 
-#define INCREMENT_CLICK_GAP uint16_t f = GET_VALUE(clicksAndFlags, CLICK_GAP);              \
+#define INCREMENT_CLICK_GAP uint8_t f = GET_VALUE(flagSet1, CLICK_GAP);              \
                          f = f <= ((CLICK_GAP_MASK >> CLICK_GAP_OFFSET) - 1) ? f + 1 : 0;   \
-                         clicksAndFlags &= ~CLICK_GAP_MASK;                                 \
-                         clicksAndFlags |= (f << CLICK_GAP_OFFSET);
+                         flagSet1 &= ~CLICK_GAP_MASK;                                 \
+                         flagSet1 |= (f << CLICK_GAP_OFFSET);
 
 #define TOGGLE_DISPLAY_STATE \
-    (clicksAndFlags ^= DISPLAY_STATE_MASK)
+    (flagSet2 ^= DISPLAY_STATE_MASK)
 
 #define SET_DISPLAY_MODE(x) clicksAndFlags &= ~DISPLAY_MODE_MASK;           \
                             clicksAndFlags |= ((x) << DISPLAY_MODE_OFFSET);
@@ -170,9 +175,8 @@ enum displayMode {
   EXTRA2
 };
 
-extern volatile uint16_t clicksAndFlags;
+extern volatile uint8_t flagSet1, flagSet2, flagSet3;
 extern volatile uint16_t time;
 extern volatile uint16_t timerTime;
 extern volatile uint16_t stopwatchTime;
-extern volatile uint8_t otherFlags;
 extern volatile int ticks;

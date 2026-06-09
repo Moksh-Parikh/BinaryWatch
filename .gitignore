@@ -3,4 +3,5 @@ build/*
 *.hex
 *.o
 *.vim
+*.out
 compile_commands.json

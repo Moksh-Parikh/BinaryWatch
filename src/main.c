@@ -3,15 +3,15 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <stdint.h>
 
 #define DEFAULT_FLAGS (FULL_TIME << DISPLAY_MODE_OFFSET) | \
                       (1 << DISPLAY_STATE_OFFSET)
 
-volatile uint16_t clicksAndFlags = 0;
+volatile uint8_t flagSet1 = 0, flagSet2 = 0, flagSet3 = 0;
 volatile uint16_t time = 0;
 volatile uint16_t timerTime = 0;
 volatile uint16_t stopwatchTime = 0;
-volatile uint8_t otherFlags = 0;
 volatile int ticks = 0;
 
 static inline void initTimers() {
@@ -42,7 +42,7 @@ int main(void) {
   time |= (6 << HOURS_OFFSET);
   time |= (12 << MINUTES_OFFSET);
   time |= 45;
-  clicksAndFlags = DEFAULT_FLAGS;
+  flagSet2 = DEFAULT_FLAGS;
   timerTime = (6 << HOURS_OFFSET) | (13 << MINUTES_OFFSET);
 
   fillBufferWithTime(
