@@ -3,54 +3,55 @@
 
 #include <stdbool.h>
 #include <avr/io.h>
+#include <stdint.h>
 
 volatile uint8_t charlieBufferSize = 0;
 volatile uint8_t charlieBufferPos = 0;
-volatile charliePlexPair charlieBuffer[CHARLIE_BUFFER_MAX_SIZE] = {0};
+volatile uint8_t charlieBuffer[CHARLIE_BUFFER_MAX_SIZE] = {0};
 
-charliePlexPair hourLEDS[NUMBER_OF_HOUR_LEDS] = {
-                        (charliePlexPair){1, 0},
-                        (charliePlexPair){0, 1},
-                        (charliePlexPair){2, 0},
-                        (charliePlexPair){0, 2},
-                        (charliePlexPair){3, 0},
-                        (charliePlexPair){0, 3},
-                        (charliePlexPair){0, 4},
-                        (charliePlexPair){4, 0},
-                        (charliePlexPair){1, 2},
-                        (charliePlexPair){2, 1},
-                        (charliePlexPair){3, 1},
-                        (charliePlexPair){1, 3}
-                      };
+uint8_t hourLEDS[NUMBER_OF_HOUR_LEDS] =
+{
+    1,
+    8,
+    2,
+    16,
+    3,
+    24,
+    32,
+    4,
+    17,
+    10,
+    11,
+    25
+};
 
-charliePlexPair minuteLEDS[NUMBER_OF_MINUTE_LEDS] = {
-                        (charliePlexPair){1, 4},
-                        (charliePlexPair){4, 1},
-                        (charliePlexPair){2, 3},
-                        (charliePlexPair){3, 2},
-                        (charliePlexPair){2, 4},
-                        (charliePlexPair){4, 2},
-                        };
+uint8_t minuteLEDS[NUMBER_OF_MINUTE_LEDS] =
+{
+    33,
+    12,
+    26,
+    19,
+    34,
+    20
+};
 
-charliePlexPair indicatorLED = {3, 4};
-charliePlexPair alarmLED = {4, 3};
+uint8_t indicatorLED = 35;
+uint8_t alarmLED = 28;
 
 void charlieRender(uint8_t sliceStart, uint8_t sliceEnd) {
   if (sliceEnd > charlieBufferSize)
     sliceEnd = charlieBufferSize;
 
   if (charlieBufferPos >= sliceEnd) {
+    DDRB = 0;
+    PORTB = 0;
     if (ALARM_FIRING) {
-      DDRB = 0;
-      PORTB = 0;
-      DDRB |= (1 << alarmLED.pin1) | (1 << alarmLED.pin2);
-      PORTB |= (1 << alarmLED.pin1);
+      DDRB |= (1 << GET_PIN1(alarmLED)) | (1 << GET_PIN2(alarmLED));
+      PORTB |= (1 << GET_PIN1(alarmLED));
     }
     if (INDICATING) {
-      DDRB = 0;
-      PORTB = 0;
-      DDRB |= (1 << indicatorLED.pin1) | (1 << indicatorLED.pin2);
-      PORTB |= (1 << indicatorLED.pin1);
+      DDRB = (1 << GET_PIN1(indicatorLED)) | (1 << GET_PIN2(indicatorLED));
+      PORTB = (1 << GET_PIN1(indicatorLED));
     }
     charlieBufferPos = sliceStart;
     buttonHandler();
@@ -59,10 +60,11 @@ void charlieRender(uint8_t sliceStart, uint8_t sliceEnd) {
   DDRB = 0;
   PORTB = 0;
 
-  DDRB |= (1 << charlieBuffer[charlieBufferPos].pin1);
-  DDRB |= (1 << charlieBuffer[charlieBufferPos].pin2);
+  DDRB |= (1 << GET_PIN1(charlieBuffer[charlieBufferPos]));
+  DDRB |= (1 << GET_PIN2(charlieBuffer[charlieBufferPos]));
 
-  PORTB |= (1 << charlieBuffer[charlieBufferPos].pin1);
+  PORTB |= (1 << GET_PIN1(charlieBuffer[charlieBufferPos]));
 
   charlieBufferPos++;
 }
+

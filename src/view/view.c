@@ -38,7 +38,7 @@ void fillBufferWithTime(uint8_t hours, uint8_t minutes) {
   charlieBufferSize = 1;
 
   for (int i = 0; i < NUMBER_OF_MINUTE_LEDS; i++) {
-    if ( ( minutes & (1 << i) ) == (1 << i) ) {
+    if ((minutes >> i) & 1) {
       charlieBuffer[charlieBufferSize] = minuteLEDS[i];
       charlieBufferSize++;
     }
@@ -48,7 +48,7 @@ void fillBufferWithTime(uint8_t hours, uint8_t minutes) {
 void rewriteBufferMinutes(uint8_t minutes) {
   charlieBufferSize = BUFFER_MINUTE_OFFSET;
   for (int i = 0; i < NUMBER_OF_MINUTE_LEDS; i++) {
-    if ( ( minutes & (1 << i) ) == (1 << i) ) {
+    if ((minutes >> i) & 1) {
       charlieBuffer[charlieBufferSize] = minuteLEDS[i];
       charlieBufferSize++;
     }
@@ -57,7 +57,6 @@ void rewriteBufferMinutes(uint8_t minutes) {
 
 void rewriteBufferHours(uint8_t hours) {
   uint8_t adjustedHours = hours < NUMBER_OF_HOUR_LEDS ? hours : hours - NUMBER_OF_HOUR_LEDS;
-  
   charlieBuffer[0] = hourLEDS[adjustedHours];
 }
 

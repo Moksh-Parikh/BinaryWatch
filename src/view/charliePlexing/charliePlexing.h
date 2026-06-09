@@ -10,22 +10,19 @@
 
 #define BUFFER_MINUTE_OFFSET 1
 
-typedef struct {
-  volatile unsigned int pin1 : 3; // only has to store up to the number 4
-  volatile unsigned int pin2 : 3;
-} charliePlexPair;
-
+#define GET_PIN1(pair) ((pair) & 0x07)
+#define GET_PIN2(pair) ((pair) >> 3)
 
 extern volatile uint8_t charlieBufferSize;
 extern volatile uint8_t charlieBufferPos;
-extern volatile charliePlexPair charlieBuffer[CHARLIE_BUFFER_MAX_SIZE];
+extern volatile uint8_t charlieBuffer[CHARLIE_BUFFER_MAX_SIZE];
 
-extern charliePlexPair hourLEDS[NUMBER_OF_HOUR_LEDS];
+extern uint8_t hourLEDS[NUMBER_OF_HOUR_LEDS];
 
-extern charliePlexPair minuteLEDS[NUMBER_OF_MINUTE_LEDS];
+extern uint8_t minuteLEDS[NUMBER_OF_MINUTE_LEDS];
 
-extern charliePlexPair indicatorLED;
-extern charliePlexPair alarmLED;
+extern uint8_t indicatorLED;
+extern uint8_t alarmLED;
 
 void buttonHandler();
 void charlieRender(uint8_t sliceStart, uint8_t sliceEnd);

@@ -42,7 +42,10 @@ CFLAGS := \
     -Wextra \
     -std=c11 \
     -MMD \
-    -MP
+    -MP \
+	-ffunction-sections \
+	-fdata-sections \
+	-Wl,--gc-sections
 
 LDFLAGS := -mmcu=$(MCU)
 

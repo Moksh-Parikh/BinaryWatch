@@ -38,7 +38,7 @@ ISR(TIMER1_COMPA_vect) {
 
 
 void incrementDisplayMode() {
-  uint16_t currentMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
+  uint8_t currentMode = GET_VALUE(clicksAndFlags, DISPLAY_MODE);
   currentMode = currentMode < (NUMBER_OF_MODES - 1) ? currentMode + 1 : 0;
   clicksAndFlags &= ~DISPLAY_MODE_MASK;
   clicksAndFlags |= (currentMode << DISPLAY_MODE_OFFSET);
