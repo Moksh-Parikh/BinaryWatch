@@ -46,6 +46,9 @@ void setDisplayStateOff() {
     TIMSK &= ~(1 << OCIE0A);
     PRR |= (1 << PRTIM0);
     ENABLE_BUTTON_INTERRUPTS;
+    MCUCR |= (1 << SE);
+    MCUCR |= SLEEP_MODE_PWR_DOWN;
+    GO_TO_SLEEP;
     sei();
 }
 

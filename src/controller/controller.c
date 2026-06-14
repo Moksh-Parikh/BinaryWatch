@@ -15,6 +15,7 @@ ISR(PCINT0_vect) {
     TIMSK |= (1 << OCIE0A);
     PRR &= ~(1 << PRTIM0);
     flagSet2 |= MAGIC_CLICKS;
+    MCUCR &= ~(1 << SE);
     sei();
 }
 
