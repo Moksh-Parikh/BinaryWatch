@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#define TICKS_PER_SEC 23
+#define TICKS_PER_SEC_MINUS_1 23
 
 void modelUpdate(int8_t clicks);
 void incrementDisplayMode();

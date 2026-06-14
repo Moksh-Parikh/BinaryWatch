@@ -13,6 +13,7 @@ ISR(PCINT0_vect) {
     DDRB = 0;
     PORTB = 0;
     TIMSK |= (1 << OCIE0A);
+    PRR &= ~(1 << PRTIM0);
     flagSet2 |= MAGIC_CLICKS;
     sei();
 }

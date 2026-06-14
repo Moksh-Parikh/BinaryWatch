@@ -4,6 +4,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
+#include <avr/wdt.h>
 
 #define DEFAULT_FLAGS (FULL_TIME << DISPLAY_MODE_OFFSET)
 
@@ -22,6 +23,9 @@ static inline void initTimers() {
     // 8,000,000 cycles per second / 1024 = 7812.5 per second
     // 7812.5 / 1000 = 7 or 8 per millisecond
     OCR0A = 8;
+
+    // 8 000 000 / 16384 = 488.28
+    // 488.28 / 24 = 20.345
     OCR1A = 20;
     OCR1C = OCR1A;
 
@@ -38,11 +42,14 @@ static inline void initTimers() {
 }
 
 int main(void) {
-  time |= (6 << HOURS_OFFSET);
+  PRR |= (1 << PRUSI) | (1 << PRADC);
+  wdt_disable();
+
+  time |= (7 << HOURS_OFFSET);
   time |= (12 << MINUTES_OFFSET);
   time |= 45;
   flagSet2 = DEFAULT_FLAGS;
-  timerTime = (6 << HOURS_OFFSET) | (13 << MINUTES_OFFSET);
+  timerTime = (7 << HOURS_OFFSET) | (13 << MINUTES_OFFSET);
 
   fillBufferWithTime(
     GET_VALUE(time, HOURS),
